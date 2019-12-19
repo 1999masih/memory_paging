@@ -4,12 +4,14 @@
 #include<vector>
 #include<queue>
 #include<algorithm>
+#include <iterator>
 #include<tuple>
 #include <queue>
+#include <functional>
 #include <random>
 #include <sstream>
 #include <iterator>
-#include <cstdlib> 
+
 using namespace std;
 
 int max_size_memory = 0, size_page = 0, max_time = 0;
@@ -111,8 +113,7 @@ vector<process> read_file(string name) {
 	int finishTime = 0;
 	vector<int> mem;
 	vector<process> result;
-	string unused; 
-	file.clear();
+	string unused; file.clear();
 	file.seekg(0, ios::beg);
 	if (is_file_exist(name) == true) {
 		file >> all_process;
@@ -152,6 +153,15 @@ struct Compare {
 	}
 };
 
+struct Compare2 {
+	bool operator()(process p1, process p2)
+	{
+		// return "true" if "p1" is ordered  
+		// before "p2", for example: 
+		return p1.finishTime > p2.finishTime;
+	}
+};
+
 void algorithem(main_memory m) {
 	ofstream output;
 	output.open("output.txt");
@@ -169,6 +179,15 @@ void algorithem(main_memory m) {
 		pq.push(processes[i]);
 	}
 	priority_queue<process, vector<process>, Compare> pq2;
+	priority_queue<process, vector<process>, Compare2> pq3;
+	pq2 = pq;
+
+	while (!pq2.empty())
+	{
+		pq3.push(pq2.top());
+		pq2.pop();
+	}
+
 	pq2 = pq;
 	output << "input Queue [";
 	while (!pq2.empty())
@@ -184,7 +203,7 @@ void algorithem(main_memory m) {
 	output << "]";
 	int total_number_of_pages = max_size_memory / size_page;
 	memory_map.resize(total_number_of_pages, tuple<int, string, string>(0, "", ""));
-
+	
 	output << endl << endl;
 	/*for (int i = 0; i < memory_map.size(); i++) // print
 	{
@@ -225,13 +244,13 @@ void algorithem(main_memory m) {
 		}
 		output << "]" << endl;
 
-		output <<endl<< endl;
+		output << endl << endl;
 		output << "Memory Map :" << endl;
 
-		
+
 		if (newP.finishTime - newP.startTime > max_time)
 		{
-			output << "Process " <<newP.name <<  " cant fit, we cant use this process because its time is bigger than maximum time" << endl;
+			output << "Process " << newP.name << " cant fit, we cant use this process because its time is bigger than maximum time" << endl;
 			output << "it is deleted from the queue." << endl;
 			continue;
 		}
@@ -240,7 +259,7 @@ void algorithem(main_memory m) {
 		if (newP.finishTime - newP.startTime <= max_time && howMuchMemory(memory_map) < newP.total_memory())
 		{
 
-			bool f1 = false; 
+			bool f1 = false;
 			for (int i = 0; i < m.mem.size(); i++)
 			{
 				if (m.mem[i].name != newP.name && m.mem[i].total_memory() + howMuchMemory(memory_map) >= newP.total_memory())
@@ -261,7 +280,7 @@ void algorithem(main_memory m) {
 			}
 			if (!f1) // new process (replace with more than 1 process)
 			{
-				output << "Process " << newP.name << "(replacement algo.)  -> we chose the best place(memory pages) for this process" << endl <<"\t\t\t\t\t" <<"(multiple processes have been deleted.)" << endl;
+				output << "Process " << newP.name << "(replacement algo.)  -> we chose the best place(memory pages) for this process" << endl << "\t\t\t\t\t" << "(multiple processes have been deleted.)" << endl;
 				vector<int> name_of_process_that_can_be_deleted;
 				int total = howMuchMemory(memory_map);
 				for (int i = 0; i < m.mem.size(); i++)
@@ -292,13 +311,13 @@ void algorithem(main_memory m) {
 		max_time -= newP.finishTime - newP.startTime;
 		if (newP.total_memory() > max_size_memory)
 		{
-			output << "Process "<< newP.name<<" cant be fitted in whole memory" << endl;
+			output << "Process " << newP.name << " cant be fitted in whole memory" << endl;
 			output << "it is deleted from the queue." << endl;
 			continue;
 		}
-		
+
 		float number_of_page = (float)newP.total_memory() / (float)size_page; // for memory sizes that are not divisble by size of pages.
-		
+
 		if (roundf(number_of_page) == number_of_page) // integer
 		{
 			int count = 1;
@@ -359,11 +378,30 @@ void algorithem(main_memory m) {
 		}
 		output << endl << endl;
 	}
-		for(int i = 0 ; i < m.mem.size(); i++)
+
+	output << "input Queue [";
+	while (!pq2.empty())
+	{
+		output << pq2.top().name;
+		pq2.pop();
+		if (!pq2.empty())
 		{
-			output << "t= " << m.mem.at(i).finishTime << " " << "process " << m.mem.at(i).name << "completes" << endl;
+			output << ", ";
 		}
+	}
+	output << endl << endl << endl;
+	while (!pq3.empty())
+	{
+		output << "t = " << pq3.top().finishTime << ": Process " << pq3.top().name << " complete.";
+		pq3.pop();
 		
+		if (!pq3.empty())
+		{
+			output << endl;
+		}
+	}
+
+	output << endl << endl;
 		output << "* means: that page have internal fragmentation." << endl;
 	/*cout << endl;
 	int memo = 0;

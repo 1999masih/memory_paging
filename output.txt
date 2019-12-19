@@ -63,4 +63,11 @@ Process 3(replacement algo.)  -> we chose the best place(memory pages) for this 
 1000 - 1099 ->free page
 
 
+input Queue [
+
+
+t = 500: Process 3 complete.
+t = 1000: Process 1 complete.
+t = 2000: Process 2 complete.
+
 * means: that page have internal fragmentation.
