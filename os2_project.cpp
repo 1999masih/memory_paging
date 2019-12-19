@@ -1,22 +1,15 @@
 #include<iostream>
 #include<string>
 #include<fstream>
-#include<time.h>
 #include<vector>
 #include<queue>
-#include<chrono>
-#include<stack>
-#include<math.h>
 #include<algorithm>
-#include<Windows.h>
-#include <iterator>
 #include<tuple>
 #include <queue>
-#include <functional>
 #include <random>
 #include <sstream>
 #include <iterator>
-
+#include <cstdlib> 
 using namespace std;
 
 int max_size_memory = 0, size_page = 0, max_time = 0;
@@ -118,7 +111,8 @@ vector<process> read_file(string name) {
 	int finishTime = 0;
 	vector<int> mem;
 	vector<process> result;
-	string unused; file.clear();
+	string unused; 
+	file.clear();
 	file.seekg(0, ios::beg);
 	if (is_file_exist(name) == true) {
 		file >> all_process;
@@ -365,6 +359,11 @@ void algorithem(main_memory m) {
 		}
 		output << endl << endl;
 	}
+		for(int i = 0 ; i < m.mem.size(); i++)
+		{
+			output << "t= " << m.mem.at(i).finishTime << " " << "process " << m.mem.at(i).name << "completes" << endl;
+		}
+		
 		output << "* means: that page have internal fragmentation." << endl;
 	/*cout << endl;
 	int memo = 0;
